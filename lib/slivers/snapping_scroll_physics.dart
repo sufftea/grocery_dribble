@@ -42,19 +42,19 @@ class SnappingScrollPhysics extends ScrollPhysics {
       return null;
     }
 
-    if (settlingPixels ==
-        _calculateSettlingPixels(
-          position.pixels,
-          position.viewportDimension,
-        )) {
-      return SpringSimulation(
-        spring,
-        position.pixels,
-        settlingPixels,
-        velocity,
-        tolerance: toleranceFor(position),
-      );
-    }
+    // if (settlingPixels ==
+    //     _calculateSettlingPixels(
+    //       position.pixels,
+    //       position.viewportDimension,
+    //     )) {
+    //   return SpringSimulation(
+    //     spring,
+    //     position.pixels,
+    //     settlingPixels,
+    //     velocity,
+    //     tolerance: toleranceFor(position),
+    //   );
+    // }
 
     return SpringSimulation(
       spring,

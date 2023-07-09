@@ -18,26 +18,17 @@ class SliverTopContent extends SingleChildRenderObjectWidget {
 
 class RenderSliverTopContent extends RenderSliverSingleBoxAdapter {
   @override
-  bool hitTestSelf({
-    required double mainAxisPosition,
-    required double crossAxisPosition,
-  }) {
-    // TODO: implement hitTestSelf
-    return super.hitTestSelf(
-      mainAxisPosition: mainAxisPosition,
-      crossAxisPosition: crossAxisPosition,
-    );
-  }
-
-  @override
   bool hitTestChildren(
     SliverHitTestResult result, {
     required double mainAxisPosition,
     required double crossAxisPosition,
   }) {
-   assert(geometry!.hitTestExtent > 0.0);
+    assert(geometry!.hitTestExtent > 0.0);
     if (child != null) {
-      return hitTestBoxChild(BoxHitTestResult.wrap(result), child!, mainAxisPosition: mainAxisPosition, crossAxisPosition: crossAxisPosition);
+      return child!.hitTest(
+        BoxHitTestResult.wrap(result),
+        position: Offset(crossAxisPosition, mainAxisPosition),
+      );
     }
     return false;
   }
@@ -54,9 +45,10 @@ class RenderSliverTopContent extends RenderSliverSingleBoxAdapter {
 
     geometry = SliverGeometry(
       scrollExtent: maxHeight,
-      layoutExtent: paintOffset,
-      paintExtent: max(Utils.collapsedHeight, paintOffset),
+      layoutExtent: max(Utils.collapsedHeight, paintOffset),
+      paintExtent: maxHeight,
       maxPaintExtent: maxHeight,
+      paintOrigin:- constraints.scrollOffset,
     );
 
     child!.layout(constraints.asBoxConstraints(
