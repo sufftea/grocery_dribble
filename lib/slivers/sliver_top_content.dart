@@ -17,21 +17,21 @@ class SliverTopContent extends SingleChildRenderObjectWidget {
 }
 
 class RenderSliverTopContent extends RenderSliverSingleBoxAdapter {
-  @override
-  bool hitTestChildren(
-    SliverHitTestResult result, {
-    required double mainAxisPosition,
-    required double crossAxisPosition,
-  }) {
-    assert(geometry!.hitTestExtent > 0.0);
-    if (child != null) {
-      return child!.hitTest(
-        BoxHitTestResult.wrap(result),
-        position: Offset(crossAxisPosition, mainAxisPosition),
-      );
-    }
-    return false;
-  }
+  // @override
+  // bool hitTestChildren(
+  //   SliverHitTestResult result, {
+  //   required double mainAxisPosition,
+  //   required double crossAxisPosition,
+  // }) {
+  //   assert(geometry!.hitTestExtent > 0.0);
+  //   if (child != null) {
+  //     return child!.hitTest(
+  //       BoxHitTestResult.wrap(result),
+  //       position: Offset(crossAxisPosition, mainAxisPosition),
+  //     );
+  //   }
+  //   return false;
+  // }
 
   @override
   void performLayout() {

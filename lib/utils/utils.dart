@@ -9,5 +9,11 @@ class BaseColors {
   static const white = Colors.white;
   static const black = Colors.black;
   static final grey = Colors.grey.shade600;
-  
+  static const yellow = Color(0xfffebc40);
+}
+
+class HeroTags {
+  static const listProduct = 'list_product';
+  static const cardProduct = 'card_product';
+  static const listView = 'list_view';
 }
