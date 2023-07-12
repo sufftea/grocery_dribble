@@ -5,7 +5,7 @@ import 'package:grocery_dribble/data/data.dart';
 import 'package:grocery_dribble/data/product.dart';
 import 'package:grocery_dribble/screens/product_screen/product_screen.dart';
 import 'package:grocery_dribble/slivers/sliver_stack.dart';
-import 'package:grocery_dribble/utils/utils.dart';
+import 'package:grocery_dribble/base/utils.dart';
 import 'package:intl/intl.dart';
 
 var _lastOffset = 0.0;
@@ -22,6 +22,8 @@ class ProductList extends StatefulWidget {
 class _ProductListState extends State<ProductList> {
   final controller = ScrollController(initialScrollOffset: _lastOffset);
 
+  final productHeroNotifier = ValueNotifier<bool>(false);
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +35,6 @@ class _ProductListState extends State<ProductList> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('rebuilding');
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -72,7 +73,7 @@ class _ProductListState extends State<ProductList> {
                     itemBuilder: (context, index) {
                       final i = index * 2;
 
-                      return buildItem(context, Data.products[i]);
+                      return buildProduct(context, Data.products[i]);
                     },
                   ),
                 ),
@@ -87,7 +88,7 @@ class _ProductListState extends State<ProductList> {
 
                       final i = (index) * 2 - 1;
 
-                      return buildItem(context, Data.products[i]);
+                      return buildProduct(context, Data.products[i]);
                     },
                   ),
                 ),
@@ -148,7 +149,10 @@ class _ProductListState extends State<ProductList> {
                 ),
               ),
               const Spacer(),
-              Icon(Icons.tune_rounded, size: 30,),
+              Icon(
+                Icons.tune_rounded,
+                size: 30,
+              ),
             ],
           ),
         ),
@@ -156,18 +160,29 @@ class _ProductListState extends State<ProductList> {
     );
   }
 
-  Widget buildItem(BuildContext context, Product prod) {
+  Widget buildProduct(BuildContext context, Product prod) {
     final f = NumberFormat.currency(symbol: '\$');
 
     return Padding(
       padding: const EdgeInsets.all(5),
       child: GestureDetector(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) {
-              return ProductScreen(product: prod);
-            },
-          ));
+        onTap: () async {
+          productHeroNotifier.value = true;
+          final addedToCart = await Navigator.of(context).push(
+            // TODO: I can use PageRouteBuilder to:
+            //   1. Slow down the hero transitions (they're too fast currently)
+            //   2. Implement the transition from [ProductList] to 
+            //      [ProductScreen], that I couldn't get with heroes.
+            MaterialPageRoute(
+              builder: (context) {
+                return ProductScreen(product: prod);
+              },
+            ),
+          );
+
+          if (addedToCart) {
+            productHeroNotifier.value = false;
+          }
         },
         child: Container(
           decoration: BoxDecoration(
@@ -183,9 +198,22 @@ class _ProductListState extends State<ProductList> {
                 height: 130,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Image.asset(
-                    prod.image,
-                    fit: BoxFit.contain,
+                  child: ValueListenableBuilder(
+                    valueListenable: productHeroNotifier,
+                    builder: (context, active, child) {
+                      if (!active) {
+                        return child!;
+                      }
+
+                      return Hero(
+                        tag: prod,
+                        child: child!,
+                      );
+                    },
+                    child: Image.asset(
+                      prod.image,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               ),

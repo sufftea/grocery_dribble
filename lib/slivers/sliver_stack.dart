@@ -26,16 +26,15 @@ class SliverStackRenderObject extends RenderSliver
   // SliverStackRenderObject();
 
   @override
-  void setupParentData(covariant RenderObject child) {
-    // switch (child) {
-    //   case RenderBox child:
-    //   // child.parent = SliverStackParentData<RenderBox>();
-    //   case RenderSliver child:
-    //   // child.parent =
-    //   default:
-    //     throw TypeError();
-    // }
+  void applyPaintTransform(covariant RenderObject child, Matrix4 transform) {
+    final pd = child.parentData as SliverStackParentData;
+    pd.applyPaintTransform(transform);
 
+    // super.applyPaintTransform(child, transform);
+  }
+
+  @override
+  void setupParentData(covariant RenderObject child) {
     if (child.parentData is! SliverStackParentData<RenderObject>) {
       child.parentData = SliverStackParentData<RenderObject>();
     }
@@ -159,8 +158,8 @@ class SliverStackRenderObject extends RenderSliver
   }
 }
 
-class SliverStackParentData<T extends RenderObject> extends ParentData
-    with ContainerParentDataMixin<T> {
+class SliverStackParentData<T extends RenderObject>
+    extends SliverPhysicalParentData with ContainerParentDataMixin<T> {
   SliverStackParentData({
     this.expand = false,
   });

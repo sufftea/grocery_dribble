@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/physics.dart';
-import 'package:grocery_dribble/utils/utils.dart';
+import 'package:grocery_dribble/base/utils.dart';
 
 class SnappingScrollPhysics extends ScrollPhysics {
   const SnappingScrollPhysics({super.parent});

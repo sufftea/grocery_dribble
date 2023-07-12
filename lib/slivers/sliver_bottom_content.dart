@@ -1,6 +1,6 @@
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:grocery_dribble/utils/utils.dart';
+import 'package:grocery_dribble/base/utils.dart';
 
 class SliverBottomContent extends SingleChildRenderObjectWidget {
   const SliverBottomContent({

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grocery_dribble/base/cart_cubit/cart_cubit.dart';
 import 'package:grocery_dribble/data/product.dart';
 import 'package:grocery_dribble/screens/product_list_screen/widgets/product_list.dart';
-import 'package:grocery_dribble/utils/utils.dart';
+import 'package:grocery_dribble/base/utils.dart';
 import 'package:intl/intl.dart';
 
-class ProductScreen extends StatelessWidget {
+class ProductScreen extends StatefulWidget {
   const ProductScreen({
     required this.product,
     super.key,
@@ -13,7 +15,47 @@ class ProductScreen extends StatelessWidget {
   final Product product;
 
   @override
+  State<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
+  final addToCartNotifier = ValueNotifier<bool>(false);
+
+  void onAddToCartPressed() {
+    addToCartNotifier.value = true;
+
+    final cubit = BlocProvider.of<CartCubit>(context);
+    cubit.onAddToCart(widget.product);
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Navigator.of(context).pop(true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: BaseColors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  buildContent(),
+                  buildAppbar(context),
+                  buildBottomGradient(),
+                ],
+              ),
+            ),
+            buildFooter(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildScreenHero({required Widget child}) {
     return Hero(
       tag: HeroTags.listView,
       flightShuttleBuilder: (
@@ -51,7 +93,7 @@ class ProductScreen extends StatelessWidget {
                     opacity: t * 2 - 1,
                     child: Material(
                       type: MaterialType.transparency,
-                      child: ProductScreen(product: product),
+                      child: ProductScreen(product: widget.product),
                     ),
                   ),
               };
@@ -63,25 +105,7 @@ class ProductScreen extends StatelessWidget {
               );
             });
       },
-      child: Scaffold(
-        backgroundColor: BaseColors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    buildContent(),
-                    buildAppbar(context),
-                    buildBottomGradient(),
-                  ],
-                ),
-              ),
-              buildFooter(),
-            ],
-          ),
-        ),
-      ),
+      child: child,
     );
   }
 
@@ -96,17 +120,51 @@ class ProductScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Container(
-                height: 300,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
-                child: Image.asset(
-                  product.image,
-                  fit: BoxFit.contain,
+              Center(
+                child: ValueListenableBuilder(
+                  valueListenable: addToCartNotifier,
+                  builder: (context, addingToCart, child) {
+                    if (addingToCart) {
+                      return Hero(
+                        tag: HeroTags.cartProduct,
+                        child: Container(
+                          height: 200,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: Image.asset(
+                            widget.product.image,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return Container(
+                      height: 300,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 50,
+                      ),
+                      child: Hero(
+                        tag: widget.product,
+                        child: Image.asset(
+                          widget.product.image,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    );
+                    // return Hero(
+                    //   tag: tag,
+                    //   child:
+                    // );
+                  },
                 ),
               ),
               Text(
-                product.name,
+                widget.product.name,
                 style: const TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -114,7 +172,7 @@ class ProductScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                '${product.weight}g',
+                '${widget.product.weight}g',
                 style: TextStyle(
                   fontSize: 14,
                   color: BaseColors.grey,
@@ -128,7 +186,7 @@ class ProductScreen extends StatelessWidget {
                   buildCounterButton(),
                   const Spacer(),
                   Text(
-                    priceFormat.format(product.price),
+                    priceFormat.format(widget.product.price),
                     style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
@@ -146,7 +204,7 @@ class ProductScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                product.description,
+                widget.product.description,
                 style: const TextStyle(
                   fontSize: 18,
                 ),
@@ -208,12 +266,12 @@ class ProductScreen extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             child: Row(
               children: [
                 IconButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(false);
                   },
                   icon: const Icon(Icons.chevron_left, size: 35),
                 ),
@@ -288,7 +346,9 @@ class ProductScreen extends StatelessWidget {
             child: SizedBox(
               height: height,
               child: FilledButton(
-                onPressed: () {},
+                onPressed: () {
+                  onAddToCartPressed();
+                },
                 style: const ButtonStyle(
                   backgroundColor: MaterialStatePropertyAll(BaseColors.yellow),
                   foregroundColor: MaterialStatePropertyAll(BaseColors.black),
