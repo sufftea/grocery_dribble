@@ -54,7 +54,6 @@ class ItemListScreen extends StatelessWidget {
 
         final progress = (currHeight - Utils.collapsedHeight) /
             (maxHeight - Utils.collapsedHeight);
-        debugPrint('progress: $progress');
 
         return Stack(
           children: [

@@ -178,7 +178,7 @@ class _ProductListState extends State<ProductList> {
                 return ProductScreen(product: prod);
               },
             ),
-          );
+          ) ?? false;
 
           if (addedToCart) {
             productHeroNotifier.value = false;
