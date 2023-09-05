@@ -169,10 +169,6 @@ class _ProductListState extends State<ProductList> {
         onTap: () async {
           productHeroNotifier.value = true;
           final addedToCart = await Navigator.of(context).push(
-            // TODO: I can use PageRouteBuilder to:
-            //   1. Slow down the hero transitions (they're too fast currently)
-            //   2. Implement the transition from [ProductList] to 
-            //      [ProductScreen], that I couldn't get with heroes.
             MaterialPageRoute(
               builder: (context) {
                 return ProductScreen(product: prod);
